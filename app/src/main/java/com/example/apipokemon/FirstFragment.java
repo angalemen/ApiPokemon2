@@ -7,10 +7,12 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.preference.PreferenceManager;
 
 import com.example.apipokemon.databinding.FragmentFirstBinding;
@@ -24,8 +26,7 @@ public class FirstFragment extends Fragment {
 
     private FragmentFirstBinding binding;
     private ArrayList<Pokemon> listapok = new ArrayList<>();
-    private ArrayAdapter<Pokemon> adaptador;
-
+    private PokemonAdapter pokemonAdapter;
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -41,16 +42,30 @@ public class FirstFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
-        adaptador = new ArrayAdapter<>(
+        pokemonAdapter = new PokemonAdapter(
                 getContext(),
                 R.layout.lv_pokemon_row,
-                R.id.Nombre,
                 listapok
         );
 
 
-        binding.listview1.setAdapter(adaptador);
+        binding.listview1.setAdapter(pokemonAdapter);
         refresh();
+
+
+        binding.listview1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Pokemon pokimg=pokemonAdapter.getItem(position);
+
+                Bundle args=new Bundle();
+                args.putString("ImagenPokemon",pokimg.getImage());
+                args.putString("Nombre Pokemon", pokimg.getName());
+
+                Navigation.findNavController(view).navigate(R.id.action_FirstFragment_to_SecondFragment,args);
+            }
+        });
+
 
     }
 
@@ -78,7 +93,7 @@ public class FirstFragment extends Fragment {
                 listapok.addAll(pokemons);
 
                 // Notifica al adaptador que los datos han cambiado
-                adaptador.notifyDataSetChanged();
+                pokemonAdapter.notifyDataSetChanged();
             });
         });
  
